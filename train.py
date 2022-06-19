@@ -69,11 +69,13 @@ def prepare_directories_and_logger(output_directory, log_directory, rank):
         logger = None
     return logger
 
-def anneal_lr(learning_rate, hparams) :
-    if learning_rate>=hparams.learning_rate :
+
+def anneal_lr(learning_rate, hparams):
+    if learning_rate >= hparams.learning_rate:
         return learning_rate
-    else :
-        return learning_rate+(hparams.learning_rate/hparams.anneal)
+    else:
+        return learning_rate + (hparams.learning_rate / hparams.anneal)
+
 
 def load_model(hparams):
     model = Tacotron2(hparams).cuda()
@@ -93,24 +95,24 @@ def warm_start_model(checkpoint_path, model, ignore_layers):
     print("Warm starting model from checkpoint '{}'".format(checkpoint_path))
     checkpoint_dict = torch.load(checkpoint_path, map_location='cpu')
     model_dict = checkpoint_dict['state_dict']
-    
+
     if len(ignore_layers) > 0:
         common_parts_dict = {}
-        for k , v in model_dict.items() :
+        for k, v in model_dict.items():
             should_ignore = False
-            for elem in ignore_layers :
-                if k.count(elem)>0:
-                    should_ignore=True
+            for elem in ignore_layers:
+                if k.count(elem) > 0:
+                    should_ignore = True
                     break
-            if not should_ignore :
+            if not should_ignore:
                 common_parts_dict[k] = v
-        
+
         dummy_dict = model.state_dict()
         dummy_dict.update(common_parts_dict)
         model_dict = dummy_dict
-    
+
     model.load_state_dict(model_dict)
-    
+
     return model
 
 
@@ -122,7 +124,7 @@ def load_checkpoint(checkpoint_path, model, optimizer):
     optimizer.load_state_dict(checkpoint_dict['optimizer'])
     learning_rate = checkpoint_dict['learning_rate']
     iteration = checkpoint_dict['iteration']
-    print("Loaded checkpoint '{}' from iteration {}" .format(
+    print("Loaded checkpoint '{}' from iteration {}".format(
         checkpoint_path, iteration))
     return model, optimizer, learning_rate, iteration
 
@@ -254,7 +256,7 @@ def train(output_directory, log_directory, checkpoint_path, warm_start, n_gpus,
             optimizer.step()
             learning_rate = anneal_lr(learning_rate, hparams)
             model.decoder.residual_encoder.after_optim_step()
-            
+
             if not is_overflow and rank == 0:
                 duration = time.perf_counter() - start
                 print("Train loss {} {:.6f} Grad Norm {:.6f} {:.2f}s/it".format(

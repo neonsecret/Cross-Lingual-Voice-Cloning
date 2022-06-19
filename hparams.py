@@ -1,11 +1,40 @@
-import tensorflow as tf
-from text import symbols
+from text.symbols import symbols
+import pprint
+import ast
+
+
+class HParams(object):
+    def __init__(self, **kwargs):
+        self.__dict__.update(kwargs)
+
+    def __setitem__(self, key, value):
+        setattr(self, key, value)
+
+    def __getitem__(self, key):
+        return getattr(self, key)
+
+    def __repr__(self):
+        return pprint.pformat(self.__dict__)
+
+    def parse(self, string):
+        # Overrides hparams from a comma-separated string of name=value pairs
+        if len(string) > 0:
+            overrides = [s.split("=") for s in string.split(",")]
+            keys, values = zip(*overrides)
+            keys = list(map(str.strip, keys))
+            values = list(map(str.strip, values))
+            for k in keys:
+                self.__dict__[k] = ast.literal_eval(values[keys.index(k)])
+        return self
+
+    def values(self):
+        return pprint.pformat(self.__dict__)
 
 
 def create_hparams(hparams_string=None, verbose=False):
     """Create model hyperparameters. Parse nondefault from given string."""
 
-    hparams = tf.contrib.training.HParams(
+    hparams = HParams(
         ################################
         # Experiment Parameters        #
         ################################
@@ -20,13 +49,15 @@ def create_hparams(hparams_string=None, verbose=False):
         cudnn_enabled=True,
         cudnn_benchmark=False,
         ignore_layers=['embedding.weight', 'decoder.prenet', 'decoder.linear_projection'],
-
+        # ![](C:/Users/neon/Pictures/text.png)
         ################################
         # Data Parameters             #
         ################################
         load_mel_from_disk=False,
-        audio_dtype = 'np.int16',                 #Data type of input audio files. If not 'np.int16' ; will be converted to it.
-        use_librosa = False,                      #If you want to use librosa for loading file and automatically resampling to sampling_rate
+        audio_dtype='np.int16',  # Data type of input audio files. If not 'np.int16' ; will be
+        # converted to it.
+        use_librosa=False,  # If you want to use librosa for loading file and automatically
+        # resampling to sampling_rate
         training_files='<train_txt_file_path>',
         validation_files='<val_txt_file_path>',
         text_cleaners=['basic_cleaners'],
@@ -81,7 +112,7 @@ def create_hparams(hparams_string=None, verbose=False):
         ################################
         use_saved_learning_rate=False,
         learning_rate=1e-3,
-        anneal = 0,                             #number of iterations to anneal lr from 0 to 'learning_rate'
+        anneal=0,  # number of iterations to anneal lr from 0 to 'learning_rate'
         weight_decay=1e-6,
         grad_clip_thresh=1.0,
         batch_size=64,
@@ -90,10 +121,10 @@ def create_hparams(hparams_string=None, verbose=False):
         ###############################
         # Speaker and Lang Embeddings #
         ###############################
-        speaker_embedding_dim = 64,
-        lang_embedding_dim = 3,
-        n_langs = 2,
-        n_speakers = 6,
+        speaker_embedding_dim=64,
+        lang_embedding_dim=3,
+        n_langs=2,
+        n_speakers=6,
 
         ###############################
         ## Speaker Classifier Params ##
@@ -103,17 +134,17 @@ def create_hparams(hparams_string=None, verbose=False):
         ##############################
         ## Residual Encoder Params  ##
         ##############################
-        residual_encoding_dim = 32,          #16 for q(z_l|X) and 16 for q(z_o|X)
-        dim_yo = 6,                          #(==n_speakers) dim(y_{o})
-        dim_yl = 10,                         #K
-        mcn = 8                              #n for monte carlo sampling of q(z_l|X)and q(z_o|X)
+        residual_encoding_dim=32,  # 16 for q(z_l|X) and 16 for q(z_o|X)
+        dim_yo=6,  # (==n_speakers) dim(y_{o})
+        dim_yl=10,  # K
+        mcn=8  # n for monte carlo sampling of q(z_l|X)and q(z_o|X)
     )
 
     if hparams_string:
-        tf.logging.info('Parsing command line hparams: %s', hparams_string)
+        print('Parsing command line hparams: %s', hparams_string)
         hparams.parse(hparams_string)
 
     if verbose:
-        tf.logging.info('Final parsed hparams: %s', hparams.values())
+        print('Final parsed hparams: %s', hparams.values())
 
     return hparams

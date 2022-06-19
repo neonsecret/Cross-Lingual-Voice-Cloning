@@ -2,7 +2,10 @@ Cross-Lingual-Voice-Cloning
 
 
 **DISCLAIMER :- Based on the paper [Learning to Speak Fluently in a Foreign Language:Multilingual Speech Synthesis and Cross-Language Voice Cloning](https://arxiv.org/pdf/1907.04448.pdf)**
-
+<br />Differences from original fork:
+* cleaned tensorflow requirement;
+* added russian language support;
+* various code improvements
 ## Dataset Format
 The model needs to be provided 2 text files 1 for the purpose of training and 1 for validation. Each line of the txt file should follow the following format :- 
 ```
