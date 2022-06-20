@@ -169,11 +169,7 @@ def init(dl_logger_=None):
     delims = [",", ".", " ", "!", ":", "-"]
     regexPattern = '|'.join('(?={})'.format(re.escape(delim)) for delim in delims)
     if dl_logger_ is None:
-        try:
-            from synthesizer.models.tacotron_tweaked.train import dl_logger
-        except Exception as e:
-            print(e)
-            dl_logger = ShortLogger()
+        dl_logger = ShortLogger()
     else:
         dl_logger = dl_logger_
     inited = True

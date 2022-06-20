@@ -14,7 +14,10 @@ The model needs to be provided 2 text files 1 for the purpose of training and 1 
 
 ```<speaker-no>``` goes from 0 to n-1, where n is the number of speakers.
 
-```<lang-no>``` goes from 0 to m-1 , where m is the number of languages.
+```<lang-no>``` goes from 0 to m-1 , where m is the number of languages. <br>
+Lnaguage-id table:
+* en : 0
+* ru : 1
 
 ## Hparams
 ```hparams.training_files, hparams.validation_files``` need to be set to the path to the txt files of previous section.
